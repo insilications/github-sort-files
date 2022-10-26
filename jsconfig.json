@@ -1,0 +1,18 @@
+{
+    "include": ["**/*.js", "**/*.d.ts", "/*.js", "*.d.ts"],
+    "exclude": ["node_modules/**"],
+    "compilerOptions": {
+        "module": "esnext",
+        "lib": ["esnext", "DOM", "dom.iterable"],
+        "target": "esnext",
+        "allowJs": true,
+        "checkJs": true,
+        "strict": false,
+        "noImplicitThis": true,
+        "alwaysStrict": true,
+        "esModuleInterop": true,
+        "moduleResolution": "node",
+        "declaration": true,
+        "outDir": "dist"
+    }
+}

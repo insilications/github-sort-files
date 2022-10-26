@@ -6,16 +6,16 @@
 // @author      Francisco Boni Neto
 // @include     *://github.com/*
 // @run-at      document-idle
-// @grant       GM.addStyle
 // @grant       GM_addStyle
-// @grant       GM.setValue
+// @grant       GM_addStyle
 // @grant       GM_setValue
-// @grant       GM.getValue
+// @grant       GM_setValue
+// @grant       GM_getValue
 // @grant       GM_getValue
 // @grant       GM_registerMenuCommand
-// @grant       GM.registerMenuCommand
+// @grant       GM_registerMenuCommand
 // @grant       GM_unregisterMenuCommand
-// @grant       GM.unregisterMenuCommand
+// @grant       GM_unregisterMenuCommand
 // @require     https://cdnjs.cloudflare.com/ajax/libs/tinysort/2.3.6/tinysort.min.js
 // @require     https://colorjs.io/dist/color.global.js
 // @icon        https://github.githubassets.com/favicons/favicon-dark.png
@@ -29,78 +29,83 @@
     // OPTIONS:
     const locale = 'pt-br';
     const dateWidth = '234px';
-    var showExtendedTime;
-    var showExtendedTimeGlobalDefault;
+    var showExtendedTime = true;
+    var showExtendedTimeGlobalDefault = true;
 
+    // @ts-ignore
     const dark = new Color('sRGB', [0.5451, 0.58039, 0.61961], 1);
+    // @ts-ignore
     const gold_hours = new Color('sRGB', [1, 0.8431372549019608, 0], 1);
+    // @ts-ignore
     const gold2dark_hours = gold_hours.range(dark, { space: 'srgb', progression: (p) => Math.abs(p ** 0.16) });
+    // @ts-ignore
     const gold_days = new Color('sRGB', [0.9019607843137255, 0.792156862745098, 0.1803921568627451], 1);
     const gold2dark_days = gold_days.range(dark, { space: 'srgb', progression: (p) => Math.abs(p ** 0.14) });
+    // @ts-ignore
     const gold_months = new Color('sRGB', [0.8, 0.7294117647058823, 0.3215686274509804], 1);
     const gold2dark_months = gold_months.range(dark, { space: 'srgb', progression: (p) => Math.abs(p ** 0.3) });
 
-    //
-    async function showExtendedTimeClicked(event) {
+    async function showExtendedTimeClicked() {
         if (showExtendedTime) {
             showExtendedTime = false;
-            await GM.setValue(`showextendedtime_key${document.location.pathname}`, showExtendedTime);
+            GM_setValue(`showextendedtime_key${document.location.pathname}`, showExtendedTime);
         } else {
             showExtendedTime = true;
-            await GM.setValue(`showextendedtime_key${document.location.pathname}`, showExtendedTime);
+            GM_setValue(`showextendedtime_key${document.location.pathname}`, showExtendedTime);
         }
         // console.log('showExtendedTimeClicked() showExtendedTime: ', showExtendedTime);
         window.location.reload();
     }
 
-    async function showExtendedTimeGlobalDefaultClicked(event) {
+    async function showExtendedTimeGlobalDefaultClicked() {
         if (showExtendedTimeGlobalDefault) {
             showExtendedTimeGlobalDefault = false;
-            await GM.setValue(`showextendedtimeglobaldefault_key`, showExtendedTimeGlobalDefault);
+            GM_setValue(`showextendedtimeglobaldefault_key`, showExtendedTimeGlobalDefault);
         } else {
             showExtendedTimeGlobalDefault = true;
-            await GM.setValue(`showextendedtimeglobaldefault_key`, showExtendedTimeGlobalDefault);
+            GM_setValue(`showextendedtimeglobaldefault_key`, showExtendedTimeGlobalDefault);
         }
         // console.log('showExtendedTimeGlobalDefaultClicked() showExtendedTime: ', showExtendedTimeGlobalDefault);
         window.location.reload();
     }
 
     async function readShowExtendedTimeGlobalDefaultOption() {
-        let _showExtendedTimeGlobalDefault = await GM.getValue(`showextendedtimeglobaldefault_key`, false);
+        let _showExtendedTimeGlobalDefault = GM_getValue(`showextendedtimeglobaldefault_key`, false);
+        // console.log('_showExtendedTimeGlobalDefault: ', _showExtendedTimeGlobalDefault);
         if (_showExtendedTimeGlobalDefault) {
             // console.log('readShowExtendedTimeGlobalDefaultOption() 1 _showExtendedTimeGlobalDefault: ', _showExtendedTimeGlobalDefault);
-            GM.registerMenuCommand('Set Show Extended Time Default to false', showExtendedTimeGlobalDefaultClicked);
-            GM.unregisterMenuCommand('Set Show Extended Time Default to true');
+            GM_registerMenuCommand('Set Show Extended Time Default to false', showExtendedTimeGlobalDefaultClicked);
+            GM_unregisterMenuCommand('Set Show Extended Time Default to true');
             return _showExtendedTimeGlobalDefault;
         } else {
             // console.log('readShowExtendedTimeGlobalDefaultOption() 2 _showExtendedTimeGlobalDefault: ', _showExtendedTimeGlobalDefault);
-            GM.registerMenuCommand('Set Show Extended Time Default to true', showExtendedTimeGlobalDefaultClicked);
-            GM.unregisterMenuCommand('Set Show Extended Time Default to false');
+            GM_registerMenuCommand('Set Show Extended Time Default to true', showExtendedTimeGlobalDefaultClicked);
+            GM_unregisterMenuCommand('Set Show Extended Time Default to false');
             return _showExtendedTimeGlobalDefault;
         }
     }
 
     async function readShowExtendedTimeOption() {
-        let _showExtendedTime = await GM.getValue(`showextendedtime_key${document.location.pathname}`, null);
+        let _showExtendedTime = GM_getValue(`showextendedtime_key${document.location.pathname}`, null);
         if (_showExtendedTime !== null) {
             // console.log('readShowExtendedTimeOption() 1 _showExtendedTime: ', _showExtendedTime);
             if (_showExtendedTime) {
-                GM.registerMenuCommand('Set Show Extended Time to false', showExtendedTimeClicked);
-                GM.unregisterMenuCommand('Set Show Extended Time to true');
+                GM_registerMenuCommand('Set Show Extended Time to false', showExtendedTimeClicked);
+                GM_unregisterMenuCommand('Set Show Extended Time to true');
             } else {
-                GM.registerMenuCommand('Set Show Extended Time to true', showExtendedTimeClicked);
-                GM.unregisterMenuCommand('Set Show Extended Time to false');
+                GM_registerMenuCommand('Set Show Extended Time to true', showExtendedTimeClicked);
+                GM_unregisterMenuCommand('Set Show Extended Time to false');
             }
             return _showExtendedTime;
         } else {
             _showExtendedTime = showExtendedTimeGlobalDefault;
-            await GM.setValue(`showextendedtime_key${document.location.pathname}`, _showExtendedTime);
+            GM_setValue(`showextendedtime_key${document.location.pathname}`, _showExtendedTime);
             if (_showExtendedTime) {
-                GM.registerMenuCommand('Set Show Extended Time to false', showExtendedTimeClicked);
-                GM.unregisterMenuCommand('Set Show Extended Time to true');
+                GM_registerMenuCommand('Set Show Extended Time to false', showExtendedTimeClicked);
+                GM_unregisterMenuCommand('Set Show Extended Time to true');
             } else {
-                GM.registerMenuCommand('Set Show Extended Time to true', showExtendedTimeClicked);
-                GM.unregisterMenuCommand('Set Show Extended Time to false');
+                GM_registerMenuCommand('Set Show Extended Time to true', showExtendedTimeClicked);
+                GM_unregisterMenuCommand('Set Show Extended Time to false');
             }
             // console.log('readShowExtendedTimeOption() 2 _showExtendedTime: ', _showExtendedTime);
             return _showExtendedTime;
@@ -182,9 +187,9 @@
                 for (let lindx = 0; lindx < llen; lindx++) {
                     if (target.matches(targets[lindx])) {
                         obs.disconnect();
-                        console.clear();
-                        console.log('observer() 1: obs disconnected');
-                        console.log('observer() 2: mutations[mindx].target: ', target);
+                        // console.clear();
+                        // console.log('observer() 1: obs disconnected');
+                        // console.log('observer() 2: mutations[mindx].target: ', target);
                         fireEventsTimer = setTimeout(() => {
                             fireEvents();
                         }, 300);
@@ -194,7 +199,7 @@
                 }
             }
             if (found) {
-                console.log('observer() 4: found is true, reconnect observe again');
+                // console.log('observer() 4: found is true, reconnect observe again');
                 reconnectTimer = setTimeout(() => {
                     restartObserver();
                 }, 500);
@@ -303,46 +308,53 @@
     }
 
     async function addRepoFileHeader() {
-        console.log('addRepoFileHeader()');
+        // console.log('addRepoFileHeader()');
         showExtendedTimeGlobalDefault = await readShowExtendedTimeGlobalDefaultOption();
         showExtendedTime = await readShowExtendedTimeOption();
         // console.log('showExtendedTimeGlobalDefault 2: ', showExtendedTimeGlobalDefault);
         // console.log('showExtendedTime 2: ', showExtendedTime);
-        const $header = $('#files');
+        const header = $('#files');
         // h2#files is a sibling of the grid wrapper
-        const $target = $header && $("div[role='grid'] .sr-only", $header.parentElement);
-        if ($header && $target) {
-            $target.className = 'Box-row Box-row--focus-gray py-2 d-flex position-relative js-navigation-item ghsc-header';
-            $target.innerHTML = `
+        // <div role="columnheader" aria-sort="none" data-index="4" class="text-gray-light ghsc-age ghsc-header-cell" style="width:${showExtendedTime ? dateWidth : '100px'};">
+        // <div role="columnheader" aria-sort="none" data-index="4" class="text-gray-light ghsc-age ghsc-header-cell" style="width: 100px"};">
+        if (header) {
+            const target = $("div[role='grid'] .sr-only", header.parentElement);
+            if (target) {
+                target.className = 'Box-row Box-row--focus-gray py-2 d-flex position-relative js-navigation-item ghsc-header';
+                target.innerHTML = `
       <div role="columnheader" aria-sort="none" data-index="2" class="flex-auto min-width-0 col-md-2 mr-3 ghsc-header-cell">
         Content
       </div>
       <div role="columnheader" aria-sort="none" data-index="3" class="flex-auto min-width-0 d-none d-md-block col-5 mr-3 ghsc-header-cell">
         Message
       </div>
-      <div role="columnheader" aria-sort="none" data-index="4" class="text-gray-light ghsc-age ghsc-header-cell" style="width:${showExtendedTime ? dateWidth : '100px'};">
-        Age
-      </div>
+      <div role="columnheader" aria-sort="none" data-index="4" class="text-gray-light ghsc-age ghsc-header-cell" style="width:${showExtendedTime ? dateWidth : '100px'};">Age</div>
     `;
-            var storedSelector = await GM.getValue(`selector_key${document.location.pathname}`, '');
-            console.log('addRepoFileHeader() storedSelector: ', storedSelector);
-            if (!storedSelector) {
-                storedSelector = 'div.text-gray-light.ghsc-age.ghsc-header-cell';
-            }
-            if (storedSelector) {
-                const dataSelector = /** @type {HTMLElement} */ (document.querySelector(storedSelector));
-                console.log('addRepoFileHeader() dataSelector.innerText: ', dataSelector.innerText);
-                await sortFiles(dataSelector);
-                return;
+                let storedSelector = GM_getValue(`selector_key${document.location.pathname}`, '');
+                // console.log('addRepoFileHeader() storedSelector 1: ', storedSelector);
+                if (!storedSelector) {
+                    storedSelector = 'div.text-gray-light.ghsc-age.ghsc-header-cell';
+                }
+                // console.log('addRepoFileHeader() storedSelector 2: ', storedSelector);
+                if (storedSelector) {
+                    const dataSelector = /** @type {HTMLElement} */ (document.querySelector(storedSelector));
+                    // console.log('addRepoFileHeader() dataSelector: ', dataSelector);
+                    await sortFiles(dataSelector);
+                    return;
+                }
             }
         }
     }
 
+    /**
+     *
+     * @param {HTMLElement} el
+     */
     async function sortFiles(el) {
         let days = [];
         let daysElements = [];
         removeSelection();
-        var dir = await GM.getValue(`direction_key${document.location.pathname}`, '');
+        let dir = GM_getValue(`direction_key${document.location.pathname}`, '');
         if (!dir) {
             dir = 'desc';
         }
@@ -378,12 +390,12 @@
                     timeDivs[tx].setAttribute('relativeTime', timeDivs[tx].innerHTML.trimEnd());
                     timeDivs[tx].innerText = timeDivs[tx].innerText + ' - ' + datetime2string(dateTime);
                 }
-                console.log('dateNow - datetime = ', days[days.length - 1], ' days');
-                console.log(' ');
+                // console.log('dateNow - datetime = ', days[days.length - 1], ' days');
+                // console.log(' ');
             }
         }
         let maxDays = Math.max(...days);
-        console.log('Max: ', maxDays);
+        // console.log('Max: ', maxDays);
         for (let tx = 0; tx < daysElements.length; tx++) {
             const val = Math.abs(days[tx] / maxDays);
             if (days[tx] < 2) {
@@ -457,8 +469,8 @@
         //     }
         // }
 
-        await GM.setValue(`direction_key${document.location.pathname}`, dir);
-        await GM.setValue(`selector_key${document.location.pathname}`, getSelector(el));
+        GM_setValue(`direction_key${document.location.pathname}`, dir);
+        GM_setValue(`selector_key${document.location.pathname}`, getSelector(el));
     }
 
     function getCss(type) {
@@ -502,7 +514,7 @@
     }
 
     function update() {
-        console.log('update()');
+        // console.log('update()');
         Object.keys(sortables).forEach((item) => {
             if (sortables[item].setup) {
                 sortables[item].setup(window.location);
@@ -527,8 +539,8 @@
     }
 
     function init() {
-        console.log('init()');
-        GM.addStyle(`
+        // console.log('init()');
+        GM_addStyle(`
     /* Added time colors */
     .ghsc-latest {
       color: #ffd700 !important;
@@ -559,8 +571,8 @@
 
         document.addEventListener('click', (event) => {
             const target = /** @type {HTMLElement} */ (event.target);
-            console.clear();
-            console.log('target clicked: ', target);
+            // console.clear();
+            // console.log('target clicked: ', target);
             // console.log('target clicked selector: ', getSelector(target));
             if (target && target.nodeType === 1) {
                 Object.keys(sortables).some((item) => {

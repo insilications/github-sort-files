@@ -16,25 +16,28 @@
 // @grant       GM.registerMenuCommand
 // @grant       GM_unregisterMenuCommand
 // @grant       GM.unregisterMenuCommand
-// @require     https://cdnjs.cloudflare.com/ajax/libs/tinysort/2.3.6/tinysort.js
-// @require     https://colorjs.io/dist/color.global.min.js
+// @require     https://cdnjs.cloudflare.com/ajax/libs/tinysort/2.3.6/tinysort.min.js
+// @require     https://colorjs.io/dist/color.global.js
 // @icon        https://github.githubassets.com/favicons/favicon-dark.png
 // ==/UserScript==
 
+// import Color from './color.js/dist/color';
+
 (async () => {
-    'use strict';
+    ('use strict');
 
     // OPTIONS:
     const locale = 'pt-br';
     const dateWidth = '234px';
     var showExtendedTime;
     var showExtendedTimeGlobalDefault;
-    const dark = new Color('sRGB', [0.5451, 0.58039, 0.61961]);
-    const gold_hours = new Color('sRGB', [1, 0.8431372549019608, 0]);
+
+    const dark = new Color('sRGB', [0.5451, 0.58039, 0.61961], 1);
+    const gold_hours = new Color('sRGB', [1, 0.8431372549019608, 0], 1);
     const gold2dark_hours = gold_hours.range(dark, { space: 'srgb', progression: (p) => Math.abs(p ** 0.16) });
-    const gold_days = new Color('sRGB', [0.9019607843137255, 0.792156862745098, 0.1803921568627451]);
+    const gold_days = new Color('sRGB', [0.9019607843137255, 0.792156862745098, 0.1803921568627451], 1);
     const gold2dark_days = gold_days.range(dark, { space: 'srgb', progression: (p) => Math.abs(p ** 0.14) });
-    const gold_months = new Color('sRGB', [0.8, 0.7294117647058823, 0.3215686274509804]);
+    const gold_months = new Color('sRGB', [0.8, 0.7294117647058823, 0.3215686274509804], 1);
     const gold2dark_months = gold_months.range(dark, { space: 'srgb', progression: (p) => Math.abs(p ** 0.3) });
 
     //
@@ -165,6 +168,7 @@
         clearTimeout(fireEventsTimer);
         clearTimeout(reconnectTimer);
 
+        /** @type {HTMLElement} */
         let target;
         let llen = targets.length;
         let mlen = mutations.length;
@@ -172,7 +176,7 @@
 
         // avoiding use of forEach loops for performance reasons
         for (let mindx = 0; mindx < mlen; mindx++) {
-            target = mutations[mindx].target;
+            target = /** @type {HTMLElement} */ (mutations[mindx].target);
             if (target) {
                 // console.log("initMut() mutations[mindx].target: ", target);
                 for (let lindx = 0; lindx < llen; lindx++) {
@@ -293,6 +297,7 @@
             natural: true,
             selector: `td:nth-child(${el.cellIndex + 1})`,
         };
+        // @ts-ignore
         tinysort($$('tbody tr', table), options);
         setDirection($$('th', table), el, dir);
     }
@@ -325,7 +330,7 @@
                 storedSelector = 'div.text-gray-light.ghsc-age.ghsc-header-cell';
             }
             if (storedSelector) {
-                const dataSelector = document.querySelector(storedSelector);
+                const dataSelector = /** @type {HTMLElement} */ (document.querySelector(storedSelector));
                 console.log('addRepoFileHeader() dataSelector.innerText: ', dataSelector.innerText);
                 await sortFiles(dataSelector);
                 return;
@@ -336,7 +341,6 @@
     async function sortFiles(el) {
         let days = [];
         let daysElements = [];
-        let dateNow = Date.now();
         removeSelection();
         var dir = await GM.getValue(`direction_key${document.location.pathname}`, '');
         if (!dir) {
@@ -358,14 +362,16 @@
         if (parentDir) {
             parentDir.closest("div[role='row']").classList.add('ghsc-header');
         }
+        // @ts-ignore
         tinysort($$('.Box-row:not(.ghsc-header)', grid), options);
         setDirection($$('.ghsc-header-cell', grid), el, dir);
 
+        /** @type {NodeListOf<HTMLElement>} */
         const timeDivs = document.querySelectorAll('time-ago');
         for (let tx = 0; tx < timeDivs.length; tx++) {
             let dateTime = new Date(timeDivs[tx].getAttribute('datetime'));
             if (dateTime) {
-                days.push(Math.round((dateNow - dateTime) * 0.000000011574));
+                days.push(Math.round((Date.now() - dateTime.getTime()) * 0.000000011574));
                 daysElements.push(timeDivs[tx]);
                 if (showExtendedTime) {
                     timeDivs[tx].parentElement.style.setProperty('width', dateWidth);
@@ -381,14 +387,14 @@
         for (let tx = 0; tx < daysElements.length; tx++) {
             const val = Math.abs(days[tx] / maxDays);
             if (days[tx] < 2) {
-                console.log('gold2dark_hours(', days[tx], '/ ', maxDays, '): gold2dark_hours(', val, ')', gold2dark_hours(val).coords);
-                daysElements[tx].style.color = gold2dark_hours(val);
+                // console.log('gold2dark_hours(', days[tx], '/ ', maxDays, '): gold2dark_hours(', val, ')', gold2dark_hours(val).coords);
+                daysElements[tx].style.color = gold2dark_hours(val).toString();
             } else if (days[tx] < 30) {
-                console.log('gold2dark_days(', days[tx], '/ ', maxDays, '): gold2dark_days(', val, ')', gold2dark_days(val).coords);
-                daysElements[tx].style.color = gold2dark_days(val);
+                // console.log('gold2dark_days(', days[tx], '/ ', maxDays, '): gold2dark_days(', val, ')', gold2dark_days(val).coords);
+                daysElements[tx].style.color = gold2dark_days(val).toString();
             } else {
-                console.log('gold2dark_months(', days[tx], '/ ', maxDays, '): gold2dark_months(', val, ')', gold2dark_months(val).coords);
-                daysElements[tx].style.color = gold2dark_months(val);
+                // console.log('gold2dark_months(', days[tx], '/ ', maxDays, '): gold2dark_months(', val, ')', gold2dark_months(val).coords);
+                daysElements[tx].style.color = gold2dark_months(val).toString();
             }
             daysElements[tx].parentElement.innerHTML = daysElements[tx].parentElement.innerHTML.replace('ago', 'ago2');
         }
@@ -417,6 +423,7 @@
         if (parentDir) {
             parentDir.closest("div[role='row']").classList.add('ghsc-header');
         }
+        // @ts-ignore
         tinysort($$('.Box-row:not(.ghsc-header)', grid), options);
         setDirection($$('.ghsc-header-cell', grid), el, dir);
 
@@ -484,7 +491,7 @@
 
     function removeSelection() {
         // remove text selection http://stackoverflow.com/a/3171348/145346
-        const sel = window.getSelection ? window.getSelection() : document.selection;
+        const sel = window.getSelection();
         if (sel) {
             if (sel.removeAllRanges) {
                 sel.removeAllRanges();
@@ -551,7 +558,7 @@
     ${getCss('tweaks')}`);
 
         document.addEventListener('click', (event) => {
-            const target = event.target;
+            const target = /** @type {HTMLElement} */ (event.target);
             console.clear();
             console.log('target clicked: ', target);
             // console.log('target clicked selector: ', getSelector(target));
